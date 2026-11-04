@@ -1,0 +1,23 @@
+[package]
+name = "vulkan-memory-allocator-sys"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Raw Rust bindings to AMD's Vulkan Memory Allocator 3.5.0, built from source with no Vulkan SDK needed."
+license = "MIT"
+repository = "https://github.com/pavlov-net/vulkan-memory-allocator-sys"
+readme = "README.md"
+keywords = ["vulkan", "vma", "gpu", "allocator", "ffi"]
+categories = ["external-ffi-bindings", "graphics", "memory-management"]
+links = "vulkan_memory_allocator"
+include = [
+    "/build.rs",
+    "/src/",
+    "/vendor/",
+    "/LICENSE-MIT",
+    "/README.md",
+    "/THIRD_PARTY_LICENSES.md",
+]
+
+[build-dependencies]
+cc = "1.2"

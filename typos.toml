@@ -1,0 +1,5 @@
+[default]
+locale = "en-us"
+
+[files]
+extend-exclude = ["Cargo.lock", "vendor/", "src/bindings.rs"]

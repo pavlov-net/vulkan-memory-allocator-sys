@@ -1,0 +1,38 @@
+exclude = '^(vendor/|src/bindings\.rs$)'
+
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "trailing-whitespace" },
+  { id = "end-of-file-fixer" },
+  { id = "mixed-line-ending" },
+  { id = "check-merge-conflict" },
+  { id = "check-yaml" },
+  { id = "check-toml" },
+]
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "typos"
+name = "typos"
+language = "system"
+entry = "typos --force-exclude"
+types = ["text"]
+
+[[repos.hooks]]
+id = "cargo-fmt"
+name = "cargo fmt --check"
+language = "system"
+entry = "cargo fmt --all -- --check"
+pass_filenames = false
+types = ["rust"]
+
+[[repos.hooks]]
+id = "cargo-clippy"
+name = "cargo clippy"
+language = "system"
+entry = "cargo clippy --all-targets --locked -- -D warnings"
+pass_filenames = false
+types = ["rust"]
