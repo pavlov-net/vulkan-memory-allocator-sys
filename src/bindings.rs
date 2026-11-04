@@ -3699,19 +3699,3 @@ unsafe extern "C" {
         pStatsString: *mut ::core::ffi::c_char,
     );
 }
-pub type VmaSysCheckFailedHandler = ::core::option::Option<
-    unsafe extern "C" fn(
-        expr: *const ::core::ffi::c_char,
-        file: *const ::core::ffi::c_char,
-        line: ::core::ffi::c_int,
-    ),
->;
-pub type VmaSysLeakHandler = ::core::option::Option<
-    unsafe extern "C" fn(expr: *const ::core::ffi::c_char),
->;
-unsafe extern "C" {
-    pub fn vmaSysSetHandlers(
-        check_failed: VmaSysCheckFailedHandler,
-        leak: VmaSysLeakHandler,
-    );
-}

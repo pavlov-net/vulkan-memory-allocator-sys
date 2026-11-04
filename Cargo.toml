@@ -19,5 +19,8 @@ include = [
     "/THIRD_PARTY_LICENSES.md",
 ]
 
+[dependencies]
+log = "0.4.14"
+
 [build-dependencies]
 cc = "1.2"
