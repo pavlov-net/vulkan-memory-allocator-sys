@@ -1,15 +1,16 @@
 // VMA's implementation. Failed checks and leaks go to `log` and stderr, so no C runtime dialog
 // opens.
 static void vma_sys_check_failed(const char* expr, const char* file, int line);
-static void vma_sys_leak(const char* format, ...);
+static void vma_sys_leak(int flush, const char* format, ...);
 
 #ifdef VMA_SYS_CHECKS
 #define VMA_ASSERT(expr) ((expr) ? (void)0 : vma_sys_check_failed(#expr, __FILE__, __LINE__))
 #else
 #define VMA_ASSERT(expr)
 #endif
-#define VMA_ASSERT_LEAK(expr) ((expr) ? (void)0 : vma_sys_leak("VMA leak: %s", #expr))
-#define VMA_LEAK_LOG_FORMAT(format, ...) vma_sys_leak("VMA leak: " format, __VA_ARGS__)
+// A block's listing comes first, so the summary is where a report ends.
+#define VMA_ASSERT_LEAK(expr) ((expr) ? (void)0 : vma_sys_leak(1, "VMA leak: %s", #expr))
+#define VMA_LEAK_LOG_FORMAT(format, ...) vma_sys_leak(0, "VMA leak: " format, __VA_ARGS__)
 
 #define VMA_IMPLEMENTATION
 #include "vma.h"
@@ -25,7 +26,7 @@ extern "C"
 #ifdef __GNUC__
 __attribute__((visibility("hidden")))
 #endif
-int vma_sys_log(const char* message, int fatal);
+int vma_sys_log(const char* message, int flush);
 
 // A logger can drop or hold a message, so stderr comes first.
 static void vma_sys_check_failed(const char* expr, const char* file, int line) {
@@ -37,13 +38,13 @@ static void vma_sys_check_failed(const char* expr, const char* file, int line) {
     std::abort();
 }
 
-static void vma_sys_leak(const char* format, ...) {
+static void vma_sys_leak(int flush, const char* format, ...) {
     char message[1024];
     std::va_list args;
     va_start(args, format);
     std::vsnprintf(message, sizeof message, format, args);
     va_end(args);
-    if (!vma_sys_log(message, 0)) {
+    if (!vma_sys_log(message, flush)) {
         std::fprintf(stderr, "%s\n", message);
     }
 }

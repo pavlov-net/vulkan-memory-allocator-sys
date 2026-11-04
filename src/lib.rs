@@ -24,7 +24,9 @@
 //! Leak reports are always on. Each one goes to `log`, or to stderr if `log_enabled!` is false for
 //! [`LOG_TARGET`]. `log` can't tell a missing logger from a filter, so filtering out the target
 //! moves leak reports to stderr rather than silencing them. A logger that accepts a report and
-//! then drops it loses it.
+//! then drops it loses it. The logger is flushed after every line below except the per-allocation
+//! lines of a block, which its closing line flushes. Reports of memory still mapped when it's
+//! freed flush once per allocation, with VMA's locks held.
 //!
 //! Each leak report is one line starting `VMA leak: `, cut off at 1023 bytes. They say:
 //!

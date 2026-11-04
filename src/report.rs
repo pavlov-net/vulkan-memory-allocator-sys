@@ -22,21 +22,21 @@ impl fmt::Display for Lossy<'_> {
     }
 }
 
-/// Logs `message`, and flushes the logger if `fatal` isn't 0. Returns 0 if the logger doesn't
+/// Logs `message`, and flushes the logger if `flush` isn't 0. Returns 0 if the logger doesn't
 /// want it.
 ///
 /// # Safety
 ///
 /// `message` is NUL-terminated.
 #[unsafe(no_mangle)]
-unsafe extern "C" fn vma_sys_log(message: *const c_char, fatal: c_int) -> c_int {
+unsafe extern "C" fn vma_sys_log(message: *const c_char, flush: c_int) -> c_int {
     if !log::log_enabled!(target: LOG_TARGET, Level::Error) {
         return 0;
     }
     // SAFETY: the caller passes a NUL-terminated string.
     let message = unsafe { CStr::from_ptr(message) }.to_bytes();
     log::error!(target: LOG_TARGET, "{}", Lossy(message));
-    if fatal != 0 {
+    if flush != 0 {
         log::logger().flush();
     }
     1

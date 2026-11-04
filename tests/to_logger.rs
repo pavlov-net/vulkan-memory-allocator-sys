@@ -8,6 +8,7 @@ use vulkan_memory_allocator_sys::LOG_TARGET;
 mod common;
 
 static LINES: Mutex<Vec<String>> = Mutex::new(Vec::new());
+static LINES_AT_FLUSHES: Mutex<Vec<usize>> = Mutex::new(Vec::new());
 
 struct Capture;
 
@@ -20,7 +21,10 @@ impl Log for Capture {
         LINES.lock().unwrap().push(record.args().to_string());
     }
 
-    fn flush(&self) {}
+    fn flush(&self) {
+        let lines = LINES.lock().unwrap().len();
+        LINES_AT_FLUSHES.lock().unwrap().push(lines);
+    }
 }
 
 #[test]
@@ -37,4 +41,9 @@ fn a_leak_reaches_the_logger_with_its_offset_and_size() {
         "{lines:?}"
     );
     assert!(lines[1].starts_with("VMA leak: "), "{lines:?}");
+    assert_eq!(
+        *LINES_AT_FLUSHES.lock().unwrap(),
+        [2],
+        "the logger is flushed once, after the last line"
+    );
 }
