@@ -1,7 +1,6 @@
 //! Virtual blocks run the compiled library with no Vulkan device.
 
 use std::ptr;
-use std::sync::atomic::{AtomicUsize, Ordering};
 
 use vulkan_memory_allocator_sys::*;
 
@@ -63,21 +62,4 @@ fn allocations_are_aligned_apart_and_freeable() {
         assert_ne!(vmaIsVirtualBlockEmpty(block), 0);
         vmaDestroyVirtualBlock(block);
     }
-}
-
-static LEAKS: AtomicUsize = AtomicUsize::new(0);
-
-extern "C" fn count_leak(_expr: *const core::ffi::c_char) {
-    LEAKS.fetch_add(1, Ordering::Relaxed);
-}
-
-#[test]
-fn a_leak_reaches_the_handler() {
-    // SAFETY: the handler is a static function, and any thread may set it.
-    unsafe { vmaSysSetHandlers(None, Some(count_leak)) };
-    let block = create_block();
-    allocate(block, 64, 1);
-    // SAFETY: `block` is live and not used again.
-    unsafe { vmaDestroyVirtualBlock(block) };
-    assert!(LEAKS.load(Ordering::Relaxed) >= 1);
 }

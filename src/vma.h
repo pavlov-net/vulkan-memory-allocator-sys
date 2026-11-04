@@ -11,23 +11,4 @@
 #define VMA_EXTERNAL_MEMORY_WIN32 0
 #include "vk_mem_alloc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// Called when one of VMA's internal checks fails. The process aborts when it returns.
-typedef void (*VmaSysCheckFailedHandler)(const char* expr, const char* file, int line);
-// Called when an allocator, pool or virtual block is destroyed with allocations left, or memory is
-// freed while still mapped.
-typedef void (*VmaSysLeakHandler)(const char* expr);
-
-// Replaces the handlers, which print to stderr by default. Null restores a default. Safe to call
-// from any thread. Internal checks are compiled only when the crate is built with debug
-// assertions; the leak handler is always active.
-void vmaSysSetHandlers(VmaSysCheckFailedHandler check_failed, VmaSysLeakHandler leak);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif
